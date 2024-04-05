@@ -1,0 +1,59 @@
+﻿@page "/"
+
+<PageTitle>To-Do List</PageTitle>
+
+<h1>To-Do List</h1>
+
+@using BlazorApp1.Data
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var task in tasks)
+        {
+            <tr>
+                <td>@task.Name</td>
+                <td>@(task.IsCompleted ? "Completed" : "Not Completed")</td>
+                <td>
+                    <button @onclick="() => ChangeTaskStatus(task)">Change Status</button>
+                    <button @onclick="() => RemoveTask(task)">Remove Task</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <input type="text" @bind="newTaskName" />
+    <button @onclick="AddTask">Add Task</button>
+</div>
+
+@code {
+    List<TaskModel> tasks = new List<TaskModel>();
+    string newTaskName;
+
+    void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskName))
+        {
+            tasks.Add(new TaskModel { Name = newTaskName, IsCompleted = false });
+            newTaskName = string.Empty;
+        }
+    }
+
+    void ChangeTaskStatus(TaskModel task)
+    {
+        task.IsCompleted = !task.IsCompleted;
+    }
+
+    void RemoveTask(TaskModel task)
+    {
+        tasks.Remove(task);
+    }
+}

@@ -1,0 +1,81 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Animal API</PageTitle>
+
+<h1>Animal API</h1>
+
+@using System.Net.Http
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@if (animal != null)
+{
+    <div>
+        <p>Name: @animal.Name</p>
+        <p>Common Name: @animal.Characteristics.CommonName</p>
+        <p>Group: @animal.Characteristics.Group</p>
+        <p>Habitat: @animal.Characteristics.Habitat</p>
+        <p>Lifespan: @animal.Characteristics.Lifespan</p>
+        <p>Weight: @animal.Characteristics.Weight</p>
+        <p>Height: @animal.Characteristics.Height</p>
+        <p>Color: @animal.Characteristics.Color</p>
+        <p>Top Speed: @animal.Characteristics.TopSpeed</p>
+        <p>Slogan: @animal.Characteristics.Slogan</p>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private Animal animal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://animals-by-api-ninjas.p.rapidapi.com/v1/animals?name=cheetah"),
+                Headers =
+            {
+                { "X-RapidAPI-Key", "91384fcab6mshcd94699fc46472bp1f3857jsn17f367018ab4" },
+                { "X-RapidAPI-Host", "animals-by-api-ninjas.p.rapidapi.com" },
+            },
+            };
+
+        using (var response = await client.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+            animal = JsonSerializer.Deserialize<Animal[]>(responseBody, options)[0];
+        }
+    }
+
+    public class Animal
+    {
+        public string Name { get; set; }
+        public Characteristics Characteristics { get; set; }
+    }
+
+    public class Characteristics
+    {
+        [JsonPropertyName("common_name")]
+        public string CommonName { get; set; }
+        public string Group { get; set; }
+        public string Lifespan { get; set; }
+        public string Weight { get; set; }
+        public string Height { get; set; }
+        public string TopSpeed { get; set; }
+        public string Slogan { get; set; }
+        public string Habitat { get; set; }
+        public string Color { get; set; }
+    }
+}

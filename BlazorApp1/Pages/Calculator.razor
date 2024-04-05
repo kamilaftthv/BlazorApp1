@@ -1,0 +1,85 @@
+﻿@page "/calculator"
+
+<PageTitle>Calculator</PageTitle>
+
+<h1>Calculator</h1>
+
+<div>
+    <div>@currentNumber</div>
+    <button @onclick="(() => AppendNumber(1))">1</button>
+    <button @onclick="(() => AppendNumber(2))">2</button>
+    <button @onclick="(() => AppendNumber(3))">3</button>
+    <button @onclick="(() => AppendOperator('+'))">+</button>
+    <button @onclick="(() => AppendNumber(4))">4</button>
+    <button @onclick="(() => AppendNumber(5))">5</button>
+    <button @onclick="(() => AppendNumber(6))">6</button>
+    <button @onclick="(() => AppendOperator('-'))">-</button>
+    <button @onclick="(() => AppendNumber(7))">7</button>
+    <button @onclick="(() => AppendNumber(8))">8</button>
+    <button @onclick="(() => AppendNumber(9))">9</button>
+    <button @onclick="(() => AppendOperator('*'))">*</button>
+    <button @onclick="(() => AppendOperator('/'))">/</button>
+    <button @onclick="CalculateResult">=</button>
+</div>
+
+
+@code {
+    string currentNumber = "";
+    char? lastOperator = null;
+    int? firstNumber = null;
+
+    void AppendNumber(int number)
+    {
+        currentNumber += number.ToString();
+    }
+
+    void AppendOperator(char operatorChar)
+    {
+        if (!string.IsNullOrEmpty(currentNumber))
+        {
+            if (lastOperator != null)
+            {
+                CalculateResult();
+            }
+
+            firstNumber = int.Parse(currentNumber);
+            currentNumber = "";
+            lastOperator = operatorChar;
+        }
+    }
+
+    void CalculateResult()
+    {
+        if (!string.IsNullOrEmpty(currentNumber) && firstNumber != null && lastOperator != null)
+        {
+            int secondNumber = int.Parse(currentNumber);
+            int result = 0;
+            switch (lastOperator)
+            {
+                case '+':
+                    result = firstNumber.Value + secondNumber;
+                    break;
+                case '-':
+                    result = firstNumber.Value - secondNumber;
+                    break;
+                case '*':
+                    result = firstNumber.Value * secondNumber;
+                    break;
+                case '/':
+                    if (secondNumber != 0)
+                    {
+                        result = firstNumber.Value / secondNumber;
+                    }
+                    else
+                    {
+                        // Обработка деления на ноль
+                    }
+                    break;
+            }
+            currentNumber = result.ToString();
+            firstNumber = result;
+            lastOperator = null;
+        }
+    }
+}
+

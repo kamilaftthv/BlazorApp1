@@ -1,0 +1,93 @@
+﻿@page "/counter"
+
+<PageTitle>Calculator</PageTitle>
+
+<h1>Calculator</h1>
+
+<div style="display: grid; grid-template-columns: repeat(4, 80px); grid-gap: 10px;">
+    <div style="grid-column: span 4; text-align: right; height: 40px; padding: 7px; background-color: #A2A5FF; border: 2px solid black;">@currentNumber</div>
+    <button @onclick="(() => AppendNumber(1))">1</button>
+    <button @onclick="(() => AppendNumber(2))">2</button>
+    <button @onclick="(() => AppendNumber(3))">3</button>
+    <button style="background-color: #CDD3FF;" @onclick="(() => AppendOperator('+'))">+</button>
+    <button @onclick="(() => AppendNumber(4))">4</button>
+    <button @onclick="(() => AppendNumber(5))">5</button>
+    <button @onclick="(() => AppendNumber(6))">6</button>
+    <button style="background-color: #CDD3FF;" @onclick="(() => AppendOperator('-'))">-</button>
+    <button @onclick="(() => AppendNumber(7))">7</button>
+    <button @onclick="(() => AppendNumber(8))">8</button>
+    <button @onclick="(() => AppendNumber(9))">9</button>
+    <button style="background-color: #CDD3FF;" @onclick="(() => AppendOperator('*'))">*</button>
+    <button style="grid-column: span 3;" @onclick="(() => AppendNumber(0))">0</button>
+    <button style="background-color: #CDD3FF;" @onclick="(() => AppendOperator('/'))">/</button>
+    <button style="background-color: #A2A5FF; grid-column: span 3;" @onclick="CalculateResult">=</button>
+    <button style="background-color: #CDD3FF;" @onclick="EraseLastCharacter">&lt;|</button>
+</div>
+
+@code {
+    string currentNumber = "";
+    char? lastOperator = null;
+    int? firstNumber = null;
+
+    void AppendNumber(int number)
+    {
+        currentNumber += number.ToString();
+    }
+
+    void AppendOperator(char operatorChar)
+    {
+        if (!string.IsNullOrEmpty(currentNumber))
+        {
+            if (lastOperator != null)
+            {
+                CalculateResult();
+            }
+
+            firstNumber = int.Parse(currentNumber);
+            currentNumber = "";
+            lastOperator = operatorChar;
+        }
+    }
+
+    void CalculateResult()
+    {
+        if (!string.IsNullOrEmpty(currentNumber) && firstNumber != null && lastOperator != null)
+        {
+            int secondNumber = int.Parse(currentNumber);
+            int result = 0;
+            switch (lastOperator)
+            {
+                case '+':
+                    result = firstNumber.Value + secondNumber;
+                    break;
+                case '-':
+                    result = firstNumber.Value - secondNumber;
+                    break;
+                case '*':
+                    result = firstNumber.Value * secondNumber;
+                    break;
+                case '/':
+                    if (secondNumber != 0)
+                    {
+                        result = firstNumber.Value / secondNumber;
+                    }
+                    else
+                    {
+                        currentNumber = "Error";
+                        return;
+                    }
+                    break;
+            }
+            currentNumber = result.ToString();
+            firstNumber = result;
+            lastOperator = null;
+        }
+    }
+    void EraseLastCharacter()
+    {
+        if (!string.IsNullOrEmpty(currentNumber))
+        {
+            currentNumber = currentNumber.Substring(0, currentNumber.Length - 1);
+        }
+    }
+}
